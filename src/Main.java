@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Objects;
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws IOException{
@@ -26,27 +27,69 @@ public class Main {
             int minLength = 1024;
             int maxLength = 0;
             int lineCount = 0;
+            String ip="";
+            String date="";
+            String method="";
+            String response="";
+            String size="";
+            String referer="";
+            String userAgent="";
+            String userAgentBot = "";
+            int yandexBotCount = 0;
+            int googleBotCount = 0;
 
             try {
                 FileReader fileReader = new FileReader(path);
                 BufferedReader reader =
                         new BufferedReader(fileReader);
                 String line;
+
                 while ((line = reader.readLine()) != null) {
                     lineCount++;
                     int length = line.length();
-                    if(length>maxLength)maxLength=length;
-                    if(length<minLength)minLength=length;
+                    if (length > maxLength) maxLength = length;
+                    if (length < minLength) minLength = length;
+
+                    String[] ss1 = line.split(" ");
+                    ip = ss1[0];
+                    date = ss1[3] + " " + ss1[4];
+                    response = ss1[8];
+                    size = ss1[9];
+
+                    String[] ss2 = line.split("\"");
+                    method = ss2[1];
+                    referer = ss2[3];
+                    userAgent = ss2[5];
+
+                    if(!userAgent.equals("-")) {
+                        if(userAgent.contains("(")) {
+                        String[] ss3 = userAgent.split("\\(");
+                        String firstBrackets = ss3[1];
+
+                        String[] parts = firstBrackets.split(";");
+                        String fragment = parts[0];
+                        if (parts.length >= 2) {
+                            fragment = parts[1];
+                        }
+                        fragment = fragment.trim();
+                        String[] ss4 = fragment.split("/");
+                        userAgentBot = ss4[0];
+
+                        if (userAgentBot.equals("YandexBot")) yandexBotCount++;
+                        if (userAgentBot.equals("Googlebot")) googleBotCount++;
+                    }
+                    }
+
                     if(length>1024) throw new RuntimeException("Длина строки файла превышает 1024 символа");
                 }
             } catch (Exception ex) {
                ex.printStackTrace();
             }
-            System.out.println("Общее количество строк в файле: "+lineCount);
-            if(lineCount>0) {
-                System.out.println("Длина самой длинной строки в файле: " + maxLength);
-                System.out.println("Длина самой короткой строки в файле: " + minLength);
-            }
+
+            System.out.println("Количество запросов от YandexBot: "+yandexBotCount );
+            System.out.println("Количество запросов от Googlebot: "+ googleBotCount);
+            System.out.println("Доля запросов от YandexBot: "+(double) yandexBotCount /lineCount);
+            System.out.println("Доля запросов от Googlebot: "+(double) googleBotCount /lineCount);
         }
     }
 }
