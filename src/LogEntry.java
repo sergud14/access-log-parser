@@ -1,4 +1,7 @@
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 public class LogEntry {
     final String ipAddr;
     final LocalDateTime time;
@@ -37,13 +40,25 @@ public class LogEntry {
     public LogEntry(String logLine) {
         String[] splitLine = logLine.split(" ");
         this.ipAddr = splitLine[0];
-        this.time = LocalDateTime.parse(splitLine[3] + " " + splitLine[4]) ;
+        splitLine = logLine.split("\"");
+        String meth=splitLine[1];
+        splitLine = meth.split(" ");
+        meth=splitLine[0];
+        meth=meth.replace("\"","");
+        this.method = HttpMethod.valueOf(meth);
+        splitLine = logLine.split(" ");
+        String in=splitLine[8];
         this.responseCode =Integer.parseInt(splitLine[8]);
         this.responseSize =Integer.parseInt(splitLine[9]);
         this.path = splitLine[6];
         splitLine = logLine.split("\"");
-        this.method = HttpMethod.valueOf(splitLine[1]);
+        String sd=splitLine[1];
         this.referer = splitLine[3];
         this.userAgent = splitLine[5];
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss").withLocale(Locale.US);;
+        splitLine = logLine.split("\\[");
+        String dt=splitLine[1].substring(0,20);
+        this.time = LocalDateTime.parse(dt,formatter);
     }
 }
