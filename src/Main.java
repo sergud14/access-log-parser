@@ -3,7 +3,7 @@ import java.util.Objects;
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws IOException{
-
+        Statistics st= new Statistics();
         int i=0;
         while(true)
         {
@@ -27,7 +27,7 @@ public class Main {
             int minLength = 1024;
             int maxLength = 0;
             int lineCount = 0;
-            String ip="";
+/*            String ip="";
             String date="";
             String method="";
             String response="";
@@ -36,7 +36,7 @@ public class Main {
             String userAgent="";
             String userAgentBot = "";
             int yandexBotCount = 0;
-            int googleBotCount = 0;
+            int googleBotCount = 0;*/
 
             try {
                 FileReader fileReader = new FileReader(path);
@@ -49,8 +49,9 @@ public class Main {
                     int length = line.length();
                     if (length > maxLength) maxLength = length;
                     if (length < minLength) minLength = length;
-
-                    String[] ss1 = line.split(" ");
+                    LogEntry logEntry =new LogEntry(line);
+                    st.addEntry(logEntry);
+   /*                 String[] ss1 = line.split(" ");
                     ip = ss1[0];
                     date = ss1[3] + " " + ss1[4];
                     response = ss1[8];
@@ -60,8 +61,8 @@ public class Main {
                     method = ss2[1];
                     referer = ss2[3];
                     userAgent = ss2[5];
-
-                    if(!userAgent.equals("-")) {
+*/
+     /*               if(!userAgent.equals("-")) {
                         if(userAgent.contains("(")) {
                         String[] ss3 = userAgent.split("\\(");
                         String firstBrackets = ss3[1];
@@ -76,20 +77,21 @@ public class Main {
                         userAgentBot = ss4[0];
 
                         if (userAgentBot.equals("YandexBot")) yandexBotCount++;
-                        if (userAgentBot.equals("Googlebot")) googleBotCount++;
+                        if (userAgentBot.equals("Googlebot")) googleBotCount++;*/
                     }
-                    }
+/*                    }*/
 
-                    if(length>1024) throw new RuntimeException("Длина строки файла превышает 1024 символа");
-                }
+/*                    if(length>1024) throw new RuntimeException("Длина строки файла превышает 1024 символа");*/
+                /*}*/
             } catch (Exception ex) {
-               ex.printStackTrace();
+               /*ex.printStackTrace();*/
             }
 
-            System.out.println("Количество запросов от YandexBot: "+yandexBotCount );
+/*            System.out.println("Количество запросов от YandexBot: "+yandexBotCount );
             System.out.println("Количество запросов от Googlebot: "+ googleBotCount);
             System.out.println("Доля запросов от YandexBot: "+(double) yandexBotCount /lineCount);
-            System.out.println("Доля запросов от Googlebot: "+(double) googleBotCount /lineCount);
+            System.out.println("Доля запросов от Googlebot: "+(double) googleBotCount /lineCount);*/
+            System.out.println(st.getTrafficRate());
         }
     }
 }
