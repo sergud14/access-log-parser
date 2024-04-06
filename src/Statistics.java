@@ -6,9 +6,13 @@ import java.util.HashSet;
 public class Statistics {
 private long totalTraffic;
 private long totalSystems;
+private long totalBrowsers;
 private final HashSet<String> pathsSet =new HashSet<>();
+private final HashSet<String> notFoundPathsSet =new HashSet<>();
 private final  HashMap<String,Integer> systemFrequencyMap =new HashMap<String,Integer>();
 private final  HashMap<String,Double> systemsRatesMap =new HashMap<String,Double>();
+private final  HashMap<String,Integer> browserFrequencyMap =new HashMap<String,Integer>();
+private final  HashMap<String,Double> browserRatesMap =new HashMap<String,Double>();
 private LocalDateTime minTime;
 private LocalDateTime maxTime;
     public Statistics() {
@@ -21,17 +25,30 @@ private LocalDateTime maxTime;
          if(log.time.isAfter(this.maxTime)) this.maxTime=log.time;
          totalTraffic=totalTraffic+log.responseSize;
          getPathsSet(log);
+         getNotFoundPathsSet(log);
          UserAgent userAgent =new UserAgent(log.userAgent);
-         if(!userAgent.system.equals("")) {
+         if(!userAgent.system.isEmpty()) {
              totalSystems++;
          }
+
+         if(!userAgent.browser.isEmpty()) {
+            totalBrowsers++;
+         }
+
         getSystemFrequencyMap(userAgent.system);
+        getBrowserFrequencyMap(userAgent.browser);
     }
 
     public HashSet<String> getPathsSet(LogEntry log){
         String ss= log.path;
         if(log.responseCode==200) pathsSet.add(log.path);
         return pathsSet;
+    }
+
+    public HashSet<String> getNotFoundPathsSet(LogEntry log){
+        String ss= log.path;
+        if(log.responseCode==404) notFoundPathsSet.add(log.path);
+        return notFoundPathsSet;
     }
 
     public HashMap<String,Integer> getSystemFrequencyMap(String system){
@@ -50,6 +67,23 @@ private LocalDateTime maxTime;
             systemsRatesMap.put(key,(double) systemFrequencyMap.get(key)/totalSystems);
         }
         return systemsRatesMap;
+    }
+    public HashMap<String,Integer> getBrowserFrequencyMap(String browser){
+        if(!browserFrequencyMap.containsKey(browser)) {
+            browserFrequencyMap.put(browser, 1);
+        }
+        else
+        {
+            browserFrequencyMap.put(browser, browserFrequencyMap.get(browser)+1);
+        }
+        return browserFrequencyMap;
+    }
+    public HashMap<String,Double> getBrowsersRateMap(){
+        for(HashMap.Entry<String, Integer> entry : browserFrequencyMap.entrySet()) {
+            String key = entry.getKey();
+            browserRatesMap.put(key,(double) browserFrequencyMap.get(key)/totalBrowsers);
+        }
+        return browserRatesMap;
     }
     public double getTrafficRate(){
         Duration duration = Duration.between(minTime,maxTime);
