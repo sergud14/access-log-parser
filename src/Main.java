@@ -1,9 +1,13 @@
 import java.io.*;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws IOException{
         Statistics st= new Statistics();
+        HashSet<String> sett= new HashSet<String>();
+        HashMap<String,Double> map1=new HashMap<String,Double>();
+        HashMap<String,Integer> map2=new HashMap<String,Integer>();
         int i=0;
         while(true)
         {
@@ -51,6 +55,8 @@ public class Main {
                     if (length < minLength) minLength = length;
                     LogEntry logEntry =new LogEntry(line);
                     st.addEntry(logEntry);
+                    sett=st.getPathsSet(logEntry);
+
    /*                 String[] ss1 = line.split(" ");
                     ip = ss1[0];
                     date = ss1[3] + " " + ss1[4];
@@ -86,12 +92,14 @@ public class Main {
             } catch (Exception ex) {
                /*ex.printStackTrace();*/
             }
-
+            map1=st.getSystemsRateMap();
 /*            System.out.println("Количество запросов от YandexBot: "+yandexBotCount );
             System.out.println("Количество запросов от Googlebot: "+ googleBotCount);
             System.out.println("Доля запросов от YandexBot: "+(double) yandexBotCount /lineCount);
             System.out.println("Доля запросов от Googlebot: "+(double) googleBotCount /lineCount);*/
             System.out.println(st.getTrafficRate());
+            System.out.println(map1);
+            System.out.println(sett.toString());
         }
     }
 }
