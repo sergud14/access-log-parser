@@ -28,5 +28,12 @@ final String browser;
                 this.system ="-";
             }
      }
+     public boolean isBot(String userAgentString) {
+         boolean isBot = false;
+         if (!userAgentString.equals("-") && userAgentString.contains("(")) {
+             if (userAgentString.contains("bot")) isBot = true;
+         }
+         return isBot;
+     }
 }
 
