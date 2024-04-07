@@ -105,6 +105,9 @@ public class Main {
             //System.out.println(sett.toString());
      /*       System.out.println(sett2.toString());
             System.out.println(map2);*/
+            System.out.println(st.getUsersRequestsPerHour());
+            System.out.println(st.getErrorRequestsPerHour());
+            System.out.println(st.getUniqueUserRequestsPerHour());
         }
     }
 }

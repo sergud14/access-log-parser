@@ -5,9 +5,12 @@ import java.util.HashSet;
 
 public class Statistics {
 private long totalTraffic;
+private long totalUsersRequests;
+private long totalErrorRequests;
 private long totalSystems;
 private long totalBrowsers;
 private final HashSet<String> pathsSet =new HashSet<>();
+private final HashSet<String> nonBotsIPAddrSet =new HashSet<>();
 private final HashSet<String> notFoundPathsSet =new HashSet<>();
 private final  HashMap<String,Integer> systemFrequencyMap =new HashMap<String,Integer>();
 private final  HashMap<String,Double> systemsRatesMap =new HashMap<String,Double>();
@@ -35,14 +38,29 @@ private LocalDateTime maxTime;
             totalBrowsers++;
          }
 
+        if(!userAgent.isBot(log.userAgent)) {
+            totalUsersRequests++;
+        }
+
+        if(log.responseCode>=400)
+        {
+            totalErrorRequests++;
+        }
         getSystemFrequencyMap(userAgent.system);
         getBrowserFrequencyMap(userAgent.browser);
+        getNonBotsIPAddrSet(log);
     }
 
     public HashSet<String> getPathsSet(LogEntry log){
         String ss= log.path;
         if(log.responseCode==200) pathsSet.add(log.path);
         return pathsSet;
+    }
+
+    public HashSet<String> getNonBotsIPAddrSet(LogEntry log){
+        UserAgent userAgent =new UserAgent(log.userAgent);
+        if(!userAgent.isBot(log.userAgent)) nonBotsIPAddrSet.add(log.ipAddr);
+        return nonBotsIPAddrSet;
     }
 
     public HashSet<String> getNotFoundPathsSet(LogEntry log){
@@ -89,5 +107,22 @@ private LocalDateTime maxTime;
         Duration duration = Duration.between(minTime,maxTime);
         double diffInHours = duration.toHours();
         return (double) totalTraffic/diffInHours;
+    }
+
+    public double getUsersRequestsPerHour(){
+        Duration duration = Duration.between(minTime,maxTime);
+        double diffInHours = duration.toHours();
+        long i=totalUsersRequests;
+        return (double) totalUsersRequests/diffInHours;
+    }
+
+    public double getErrorRequestsPerHour(){
+        Duration duration = Duration.between(minTime,maxTime);
+        double diffInHours = duration.toHours();
+        return (double) totalErrorRequests/diffInHours;
+    }
+
+    public double getUniqueUserRequestsPerHour(){
+        return (double) totalUsersRequests/nonBotsIPAddrSet.size();
     }
 }
