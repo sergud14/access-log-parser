@@ -10,12 +10,15 @@ private long totalErrorRequests;
 private long totalSystems;
 private long totalBrowsers;
 private final HashSet<String> pathsSet =new HashSet<>();
+private final HashSet<String> domainsSet =new HashSet<>();
 private final HashSet<String> nonBotsIPAddrSet =new HashSet<>();
 private final HashSet<String> notFoundPathsSet =new HashSet<>();
 private final  HashMap<String,Integer> systemFrequencyMap =new HashMap<String,Integer>();
 private final  HashMap<String,Double> systemsRatesMap =new HashMap<String,Double>();
 private final  HashMap<String,Integer> browserFrequencyMap =new HashMap<String,Integer>();
 private final  HashMap<String,Double> browserRatesMap =new HashMap<String,Double>();
+private final  HashMap<Integer,Integer> requestsPerSecondMap =new HashMap<Integer,Integer>();
+private final  HashMap<String, Integer> maxUserRequestsMap = new HashMap<String, Integer>();
 private LocalDateTime minTime;
 private LocalDateTime maxTime;
     public Statistics() {
@@ -49,6 +52,7 @@ private LocalDateTime maxTime;
         getSystemFrequencyMap(userAgent.system);
         getBrowserFrequencyMap(userAgent.browser);
         getNonBotsIPAddrSet(log);
+        getMaxUserRequestsMap(log);
     }
 
     public HashSet<String> getPathsSet(LogEntry log){
@@ -124,5 +128,58 @@ private LocalDateTime maxTime;
 
     public double getUniqueUserRequestsPerHour(){
         return (double) totalUsersRequests/nonBotsIPAddrSet.size();
+    }
+
+
+    public HashMap<Integer,Integer> getRequestsPerSecondMap(Integer second,LogEntry log){
+        UserAgent userAgent =new UserAgent(log.userAgent);
+        Integer i=log.time.getSecond();
+        if(log.time.getSecond()==second) {
+            if(!userAgent.isBot(log.userAgent)){
+                if(!requestsPerSecondMap.containsKey(second)) {
+                    requestsPerSecondMap.put(second, 1);
+                }
+                else
+                {
+                    requestsPerSecondMap.put(second, requestsPerSecondMap.get(second)+1);
+                }
+            }
+        }
+        return requestsPerSecondMap;
+    }
+
+    public HashSet<String> getDomainsSet(LogEntry log){
+        String domain ="-";
+        if(!log.referer.equals("-")) {
+            String[] refs1 = log.referer.split("//");
+            String ref1 = refs1[1];
+            String[] refs2 = ref1.split("/");
+            domain = refs2[0];
+        }
+        domainsSet.add(domain);
+        return domainsSet;
+    }
+
+    public HashMap<String,Integer> getMaxUserRequestsMap(LogEntry log) {
+        if (nonBotsIPAddrSet.contains(log.ipAddr)) {
+            if (!maxUserRequestsMap.containsKey(log.ipAddr)) {
+                maxUserRequestsMap.put(log.ipAddr, 1);
+            } else {
+                maxUserRequestsMap.put(log.ipAddr, maxUserRequestsMap.get(log.ipAddr) + 1);
+            }
+        }
+        return maxUserRequestsMap;
+    }
+
+    public int getMaxUserRequestsValue() {
+
+        int maxValue = 0;
+        for (int value : maxUserRequestsMap.values()) {
+            if (value > maxValue) {
+                maxValue = value;
+            }
+
+        }
+        return  maxValue;
     }
 }
