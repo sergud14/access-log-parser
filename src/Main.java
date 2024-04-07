@@ -58,6 +58,9 @@ public class Main {
                     st.addEntry(logEntry);
                     sett=st.getPathsSet(logEntry);
                     sett2=st.getNotFoundPathsSet(logEntry);
+                    //st.getRequestsPerSecondMap(4,logEntry);
+                    System.out.println(st.getRequestsPerSecondMap(5,logEntry));
+                    System.out.println(st.getDomainsSet(logEntry));
 
    /*                 String[] ss1 = line.split(" ");
                     ip = ss1[0];
@@ -105,9 +108,10 @@ public class Main {
             //System.out.println(sett.toString());
      /*       System.out.println(sett2.toString());
             System.out.println(map2);*/
-            System.out.println(st.getUsersRequestsPerHour());
+ /*           System.out.println(st.getUsersRequestsPerHour());
             System.out.println(st.getErrorRequestsPerHour());
-            System.out.println(st.getUniqueUserRequestsPerHour());
+            System.out.println(st.getUniqueUserRequestsPerHour());*/
+            System.out.println(st.getMaxUserRequestsValue());
         }
     }
 }
